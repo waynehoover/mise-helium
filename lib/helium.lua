@@ -65,16 +65,18 @@ local function read(path)
 end
 
 -- The directory is created with mkdir because the Lua runtime has no mkdir.
--- The path is single-quoted for the shell, so refuse one that contains a
--- single quote rather than try to escape it.
+-- cmd.exec rather than os.execute: it captures output instead of taking
+-- mise's terminal lock, and raises on failure. The path is single-quoted for
+-- the shell, so refuse one that contains a single quote rather than try to
+-- escape it.
 function M.ensure_external_dir()
   local dir = M.external_dir()
   if dir:find("'", 1, true) then
     error("helium: refusing a data directory containing a single quote: " .. dir)
   end
-  local ok = os.execute("mkdir -p '" .. dir .. "'")
-  if ok ~= 0 and ok ~= true then
-    error("helium: could not create " .. dir)
+  local ok, err = pcall(require("cmd").exec, "mkdir -p '" .. dir .. "'")
+  if not ok then
+    error("helium: could not create " .. dir .. ": " .. tostring(err))
   end
 end
 
