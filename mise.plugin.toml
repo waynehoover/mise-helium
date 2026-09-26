@@ -1,0 +1,7 @@
+[package-manager]
+# The hooks only read and write files in Helium's data directory; no host
+# binary is invoked.
+requires = []
+# The Chrome Web Store serves only the current version of an extension.
+supports_version_pins = false
+os = ["macos"]
